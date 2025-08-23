@@ -637,7 +637,7 @@ var ServerComponent = class extends HTMLElement {
         const normalised = next.toLowerCase();
         if (normalised == this.#method)
           return;
-        if (["ws", "sse", "polling", "window"].includes(normalised)) {
+        if (["ws", "sse", "polling", "electron"].includes(normalised)) {
           this.#method = normalised;
           if (this.#method == "ws") {
             if (this.#route.protocol == "https:")
@@ -788,8 +788,6 @@ var ServerComponent = class extends HTMLElement {
     }
   }
   #connect() {
-    console.log(this.#route);
-    console.log(this.#method);
     if (!this.#route || !this.#method)
       return;
     if (this.#transport)
@@ -819,9 +817,8 @@ var ServerComponent = class extends HTMLElement {
     };
     const options = { onConnect, onMessage, onClose };
     switch (this.#method) {
-      case "window":
-        console.log('window!!!');
-        this.#transport = new WindowTransport(this.#route, options);
+      case "electron":
+        this.#transport = new ElectronTransport(this.#route, options);
         break;
       case "ws":
         this.#transport = new WebsocketTransport(this.#route, options);
@@ -843,30 +840,7 @@ var ServerComponent = class extends HTMLElement {
     this.#adoptedStyleNodes = await adoptStylesheets(this.#shadowRoot);
   }
 };
-var WindowTransport = class {
-  // TODO electron
-  // X - static `index.html`
-  //   X * save `localhost` pageload
-  //   X * add `<script>` for this file
-  // . - impl `main.js`
-  //   X * load `index.html`
-  //   X * recv events via ipc
-  //     * send events via ipc
-  //         ```javascript
-  //         BrowserWindow.getAllWindows().forEach((electron_window) => {
-  //           electron_window.webContents.send('listen', { detail: { json } });
-  //         });
-  //         ```
-  //   X * init server component
-  //     * loop
-  //     * close
-
-  // TODO `WindowTransport`
-  //   - connect
-  //   - send
-  //   - onmessage
-  //   - close
-
+var ElectronTransport = class {
   #waitingForResponse = false;
   #queue = [];
 

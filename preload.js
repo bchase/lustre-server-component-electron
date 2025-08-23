@@ -15,4 +15,8 @@ contextBridge.exposeInMainWorld('lustre', { 'server_component': {
       callback(json);
     });
   },
+
+  close: async () => {
+    return await ipcRenderer.invoke('lustre:server-component:close');
+  },
 }});
