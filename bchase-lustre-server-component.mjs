@@ -886,21 +886,12 @@ var WindowTransport = class {
 
     this.#route = route;
 
-    // this.#socket.onopen = () => {
-    //   this.#onConnect();
-    // };
-    window.lustre.server_component.connect()
-      .then(() => {
-        this.#onConnect();
-      });
-
-
     // this.#socket.onmessage = ({ data }) => {
-    window.addEventListener("lustre:server-component:event", ({ data }) => {
+    window.lustre.server_component.listen((data) => {
       try {
         this.#onMessage(JSON.parse(data));
       } finally {
-        if (this.#queue.length) {
+        if (this.#queue.lengath) {
           // this.#socket.send(
           window[this.#route](
             JSON.stringify({
@@ -915,6 +906,14 @@ var WindowTransport = class {
       }
     // };
     });
+
+    // this.#socket.onopen = () => {
+    //   this.#onConnect();
+    // };
+    window.lustre.server_component.connect()
+      .then(() => {
+        this.#onConnect();
+      });
 
     // this.#socket.onclose = () => {
     //   this.#onClose();

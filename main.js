@@ -11,7 +11,7 @@ let socket = null;
 ipcMain.handle('lustre:server-component:connect', async (event) => {
   socket = GleamCounter.init_counter_socket();
 
-  console.log(counterSocket);
+  console.log(socket);
 
   return null;
 });
@@ -85,8 +85,11 @@ export async function setupWebSocket(server) {
 }
 
 // Function called from Gleam to send messages to the client
-export function sendToClient(message) {
-  throw "IMPLEMENT `sendToClient`";
+export function sendToClient(json) {
+  BrowserWindow.getAllWindows().forEach((electron_window) => {
+    electron_window.webContents.send('lustre:server-component:listen', { detail: { json } });
+  });
+
   // if (ws && ws.readyState === 1) { // WebSocket.OPEN
   //   ws.send(message);
   //   console.log('Sent message to client:', message);

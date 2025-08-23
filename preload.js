@@ -6,9 +6,9 @@ contextBridge.exposeInMainWorld('lustre', { 'server_component': {
     return await ipcRenderer.invoke('lustre:server-component:connect');
   },
 
-  // listen: (callback) => {
-  //   return ipcRenderer.on('listen', (_event, data) => {
-  //     callback(data);
-  //   });
-  // },
+  listen: (callback) => {
+    return ipcRenderer.on('lustre:server-component:listen', (_event, { detail: { json } }) => {
+      callback(json);
+    });
+  },
 }});
