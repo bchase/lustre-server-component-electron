@@ -1,0 +1,17 @@
+name = "counter"
+version = "1.0.0"
+description = "A Lustre server component counter targeting JavaScript"
+
+gleam = ">= 1.0.0"
+target = "javascript"
+
+[dependencies]
+gleam_stdlib = ">= 0.62.1"
+lustre = ">= 5.3.0"
+gleam_json = ">= 3.0.0"
+
+[dev-dependencies]
+lustre_dev_tools = ">= 1.9.2 and < 2.0.0"
+
+[javascript]
+runtime = "node"

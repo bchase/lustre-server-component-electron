@@ -1,101 +1,15 @@
-<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Counter App - Gleam & Lustre</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
-        }
+  <head>
+    <title>Lustre Server Component Counter</title>
 
-        #app {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            min-width: 300px;
-        }
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
 
-        h1 {
-            margin: 0 0 2rem 0;
-            color: #2c3e50;
-            font-size: 2rem;
-        }
+    <script type="module" src="./renderer.js"></script>
+    <script type="module" src="./bchase-lustre-server-component.mjs"></script>
+  </head>
 
-        p {
-            font-size: 3rem;
-            font-weight: bold;
-            margin: 1rem 0;
-            color: #e74c3c;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        button {
-            background: #3498db;
-            border: none;
-            color: white;
-            padding: 1rem 1.5rem;
-            margin: 0.5rem;
-            border-radius: 8px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        button:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        div:nth-child(2) {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        div:nth-child(2) button {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            padding: 0;
-        }
-
-        div:nth-child(3) button {
-            background: #e74c3c;
-            font-size: 1rem;
-            padding: 0.8rem 2rem;
-        }
-
-        div:nth-child(3) button:hover {
-            background: #c0392b;
-        }
-    </style>
-</head>
-<body>
-    <div id="app"></div>
-    <script type="module" src="http://localhost:1234/priv/static/counter_app.mjs"></script>
-</body>
+  <body>
+    <lustre-server-component method="window" route="window"></lustre-server-component>
+  </body>
 </html>
