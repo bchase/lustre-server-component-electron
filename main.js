@@ -11,13 +11,13 @@ let socket = null;
 ipcMain.handle('lustre:server-component:connect', async (event) => {
   socket = GleamCounter.init_counter_socket();
 
-  console.log(socket);
-
   return null;
 });
 
-ipcMain.handle('lustre:server-component:message', async (event, data) => {
-  // TODO
+ipcMain.handle('lustre:server-component:send', async (_event, msg) => {
+  GleamCounter.handle_websocket_message(socket, msg);
+
+  return null;
 });
 
 ipcMain.handle('lustre:server-component:close', async (event) => {

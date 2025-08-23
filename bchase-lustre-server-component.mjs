@@ -875,16 +875,16 @@ var WindowTransport = class {
   #onClose;
 
   // ADDED
-  #route;
+  // #route;
 
-  constructor(route, { onConnect, onMessage, onClose }) {
+  constructor(_route, { onConnect, onMessage, onClose }) {
     // this.#url = url;
     // this.#socket = new WebSocket(this.#url);
     this.#onConnect = onConnect;
     this.#onMessage = onMessage;
     this.#onClose = onClose;
 
-    this.#route = route;
+    // this.#route = route;
 
     // this.#socket.onmessage = ({ data }) => {
     window.lustre.server_component.listen((data) => {
@@ -893,7 +893,8 @@ var WindowTransport = class {
       } finally {
         if (this.#queue.lengath) {
           // this.#socket.send(
-          window[this.#route](
+          // window[this.#route](
+          window.lustre.server_component.send(
             JSON.stringify({
               kind: batch_kind,
               messages: this.#queue
@@ -927,7 +928,8 @@ var WindowTransport = class {
       return;
     } else {
       // this.#socket.send(JSON.stringify(data));
-      window[this.#route](JSON.stringify(data));
+      // window[this.#route](JSON.stringify(data));
+      window.lustre.server_component.send(JSON.stringify(data));
       this.#waitingForResponse = true;
     }
   }
