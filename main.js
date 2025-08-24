@@ -6,24 +6,17 @@ import * as GleamCounter from './build/dev/javascript/counter/app.mjs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// let sockets = null;
 let sockets = {};
 let windows = {};
 
-function slug() {
-  return btoa(`${performance.now()}${Math.random()}`.replaceAll('.', ''));
-}
-
 ipcMain.handle('lustre:server-component:connect', async (event, id) => {
-  const win = BrowserWindow.fromWebContents(event.sender);
-
-  windows[id] = win;
+  windows[id] = BrowserWindow.fromWebContents(event.sender);
   sockets[id] = GleamCounter.init_counter_socket(id);
 
   return null;
 });
 
-ipcMain.handle('lustre:server-component:send', async (event, id, msg) => {
+ipcMain.handle('lustre:server-component:send', async (_event, id, msg) => {
   GleamCounter.handle_websocket_message(sockets[id], msg);
 
   return null;
@@ -37,11 +30,13 @@ ipcMain.handle('lustre:server-component:close', async (_event) => {
 
 
 export function sendToClient(id, json) {
-  // TODO log err on none
+  const win = windows[id];
 
-  windows[id]
-    ?.webContents
-    ?.send('lustre:server-component:listen', { detail: { id, json } });
+  if ( win ) {
+    win.webContents.send('lustre:server-component:listen', { detail: { id, json } });
+  } else {
+    console.error(`Unable to find Electron window for ID: ${id}`);
+  }
 }
 
 function createWindow(html_file_path) {

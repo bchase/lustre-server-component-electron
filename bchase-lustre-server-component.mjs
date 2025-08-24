@@ -849,28 +849,20 @@ var ElectronTransport = class {
   #onMessage;
   #onClose;
 
-  // #route;
   #id;
 
   constructor(id, { onConnect, onMessage, onClose }) {
     this.#id = id;
 
-    // this.#url = url;
-    // this.#socket = new WebSocket(this.#url);
     this.#onConnect = onConnect;
     this.#onMessage = onMessage;
     this.#onClose = onClose;
 
-    // this.#route = route;
-
-    // this.#socket.onmessage = ({ data }) => {
     window.lustre.server_component.listen((data) => {
       try {
         this.#onMessage(JSON.parse(data));
       } finally {
         if (this.#queue.lengath) {
-          // this.#socket.send(
-          // window[this.#route](
           window.lustre.server_component.send(
             this.#id,
             JSON.stringify({
@@ -883,37 +875,25 @@ var ElectronTransport = class {
         }
         this.#queue = [];
       }
-    // };
     });
 
-    // this.#socket.onopen = () => {
-    //   this.#onConnect();
-    // };
     window.lustre.server_component.connect(this.#id)
       .then(() => {
         this.#onConnect();
       });
-
-    // this.#socket.onclose = () => {
-    //   this.#onClose();
-    // };
   }
 
   send(data) {
-    // if (this.#waitingForResponse || this.#socket.readyState !== WebSocket.OPEN) {
     if (this.#waitingForResponse) {
       this.#queue.push(data);
       return;
     } else {
-      // this.#socket.send(JSON.stringify(data));
-      // window[this.#route](JSON.stringify(data));
       window.lustre.server_component.send(this.#id, JSON.stringify(data));
       this.#waitingForResponse = true;
     }
   }
 
   close() {
-    // this.#socket.close();
     this.#onClose();
   }
 };

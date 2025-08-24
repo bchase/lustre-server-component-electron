@@ -1,5 +1,3 @@
-// IMPORTS ---------------------------------------------------------------------
-
 import gleam/int
 import lustre.{type App}
 import lustre/attribute
@@ -7,14 +5,9 @@ import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
 
-// MAIN ------------------------------------------------------------------------
-
-/// Universal counter component that can run both on client and server
 pub fn component() -> App(_, Model, Msg) {
   lustre.simple(init, update, view)
 }
-
-// MODEL -----------------------------------------------------------------------
 
 pub type Model =
   Int
@@ -23,21 +16,17 @@ fn init(_) -> Model {
   0
 }
 
-// UPDATE ----------------------------------------------------------------------
-
 pub opaque type Msg {
-  UserClickedIncrement
-  UserClickedDecrement
+  Inc
+  Dec
 }
 
 fn update(model: Model, msg: Msg) -> Model {
   case msg {
-    UserClickedIncrement -> model + 1
-    UserClickedDecrement -> model - 1
+    Inc -> model + 1
+    Dec -> model - 1
   }
 }
-
-// VIEW ------------------------------------------------------------------------
 
 fn view(model: Model) -> Element(Msg) {
   let count = int.to_string(model)
@@ -72,9 +61,9 @@ fn view(model: Model) -> Element(Msg) {
   element.fragment([
     html.h1([attribute.styles([#("text-align", "center")])], [html.text("Lustre Server Component Counter")]),
     html.div([attribute.styles(styles)], [
-      view_button(label: "-", on_click: UserClickedDecrement, styles: button_styles),
+      view_button(label: "-", on_click: Dec, styles: button_styles),
       html.p([attribute.styles(count_styles)], [html.text("Count: "), html.text(count)]),
-      view_button(label: "+", on_click: UserClickedIncrement, styles: button_styles),
+      view_button(label: "+", on_click: Inc, styles: button_styles),
     ]),
   ])
 }
