@@ -44,7 +44,7 @@ export function sendToClient(id, json) {
     ?.send('lustre:server-component:listen', { detail: { id, json } });
 }
 
-const createWindow = () => {
+function createWindow(html_file_path) {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
@@ -54,9 +54,10 @@ const createWindow = () => {
     },
   });
 
-  win.loadFile('index.html');
+  win.loadFile(html_file_path);
 };
 
 app.whenReady().then(() => {
-  createWindow();
+  createWindow('index.html');
+  createWindow('other.html');
 });
