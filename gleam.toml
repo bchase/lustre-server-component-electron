@@ -2,7 +2,7 @@ name = "counter"
 version = "1.0.0"
 description = "A Lustre server component counter targeting JavaScript"
 
-gleam = ">= 1.0.0"
+gleam = ">= 1.11.1"
 target = "javascript"
 
 [dependencies]

@@ -11,7 +11,6 @@ import lustre/event
 
 /// Universal counter component that can run both on client and server
 pub fn component() -> App(_, Model, Msg) {
-  echo "component"
   lustre.simple(init, update, view)
 }
 

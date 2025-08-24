@@ -13,7 +13,7 @@ import lustre/server_component
 // EXTERNAL JAVASCRIPT INTERFACE ----------------------------------------------
 
 @external(javascript, "../../../../main.js", "sendToClient")
-fn send_to_client(message: String) -> Nil
+fn send_to_client(id: String, message: String) -> Nil
 
 // RUNTIME SERVING -------------------------------------------------------------
 
@@ -29,13 +29,14 @@ pub fn get_runtime_path() -> String {
 /// State for our WebSocket connection
 pub type CounterSocket {
   CounterSocket(
+    id: String,
     component: lustre.Runtime(counter.Msg),
     registered: Bool
   )
 }
 
 /// Initialize a new counter component for a WebSocket connection
-pub fn init_counter_socket() -> CounterSocket {
+pub fn init_counter_socket(id: String) -> CounterSocket {
   let counter_app = counter.component()
   let assert Ok(component) = lustre.start_server_component(counter_app, Nil)
 
@@ -44,13 +45,13 @@ pub fn init_counter_socket() -> CounterSocket {
     client_message
     |> server_component.client_message_to_json
     |> json.to_string
-    |> send_to_client
+    |> send_to_client(id, _)
   }
 
   server_component.register_callback(callback)
   |> lustre.send(to: component)
 
-  CounterSocket(component: component, registered: True)
+  CounterSocket(id:, component: component, registered: True)
 }
 
 /// Handle incoming WebSocket messages
