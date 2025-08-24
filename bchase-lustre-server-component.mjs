@@ -862,7 +862,7 @@ var ElectronTransport = class {
       try {
         this.#onMessage(JSON.parse(data));
       } finally {
-        if (this.#queue.lengath) {
+        if (this.#queue.length) {
           window.lustre.server_component.send(
             this.#id,
             JSON.stringify({
