@@ -571,6 +571,22 @@ var property_changed_kind = 2;
 var batch_kind = 3;
 var context_provided_kind = 4;
 
+var transports = {
+  "electron": function(options) {
+    const id = this.getAttribute('route');
+    return new ElectronTransport(id, options);
+  },
+
+  // case "ws":
+  //   this.#transport = new WebsocketTransport(this.#route, options);
+  //   break;
+  // case "sse":
+  //   this.#transport = new SseTransport(this.#route, options);
+  //   break;
+  // case "polling":
+  //   this.#transport = new PollingTransport(this.#route, options);
+};
+
 // src/lustre/runtime/client/server_component.ffi.mjs
 var ServerComponent = class extends HTMLElement {
   static get observedAttributes() {
@@ -637,7 +653,7 @@ var ServerComponent = class extends HTMLElement {
         const normalised = next.toLowerCase();
         if (normalised == this.#method)
           return;
-        if (["ws", "sse", "polling", "electron"].includes(normalised)) {
+        if (Object.keys(transports).includes(normalised)) {
           this.#method = normalised;
           if (this.#method == "ws") {
             if (this.#route.protocol == "https:")
@@ -816,21 +832,25 @@ var ServerComponent = class extends HTMLElement {
       );
     };
     const options = { onConnect, onMessage, onClose };
-    switch (this.#method) {
-      case "electron":
-        const id = this.getAttribute('route');
-        this.#transport = new ElectronTransport(id, options);
-        break;
-      case "ws":
-        this.#transport = new WebsocketTransport(this.#route, options);
-        break;
-      case "sse":
-        this.#transport = new SseTransport(this.#route, options);
-        break;
-      case "polling":
-        this.#transport = new PollingTransport(this.#route, options);
-        break;
+    const initTransport = transports[this.#method]
+    if ( initTransport ) {
+      this.#transport = initTransport.apply(this, [options]);
     }
+    // switch (this.#method) {
+    //   case "electron":
+    //     const id = this.getAttribute('route');
+    //     this.#transport = new ElectronTransport(id, options);
+    //     break;
+    //   case "ws":
+    //     this.#transport = new WebsocketTransport(this.#route, options);
+    //     break;
+    //   case "sse":
+    //     this.#transport = new SseTransport(this.#route, options);
+    //     break;
+    //   case "polling":
+    //     this.#transport = new PollingTransport(this.#route, options);
+    //     break;
+    // }
   }
   //
   async #adoptStyleSheets() {
