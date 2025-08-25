@@ -788,7 +788,7 @@ var ServerComponent = class extends HTMLElement {
     }
   }
   #connect() {
-    if (!this.#route || !this.#method)
+    if ((!this.#route && this.#method !== 'electron') || !this.#method)
       return;
     if (this.#transport)
       this.#transport.close();
@@ -818,8 +818,7 @@ var ServerComponent = class extends HTMLElement {
     const options = { onConnect, onMessage, onClose };
     switch (this.#method) {
       case "electron":
-        const id = this.getAttribute('route');
-        this.#transport = new ElectronTransport(id, options);
+        this.#transport = new ElectronTransport(options);
         break;
       case "ws":
         this.#transport = new WebsocketTransport(this.#route, options);
@@ -849,11 +848,7 @@ var ElectronTransport = class {
   #onMessage;
   #onClose;
 
-  #id;
-
-  constructor(id, { onConnect, onMessage, onClose }) {
-    this.#id = id;
-
+  constructor({ onConnect, onMessage, onClose }) {
     this.#onConnect = onConnect;
     this.#onMessage = onMessage;
     this.#onClose = onClose;
@@ -864,7 +859,6 @@ var ElectronTransport = class {
       } finally {
         if (this.#queue.length) {
           window.lustre.server_component.send(
-            this.#id,
             JSON.stringify({
               kind: batch_kind,
               messages: this.#queue
@@ -877,7 +871,7 @@ var ElectronTransport = class {
       }
     });
 
-    window.lustre.server_component.connect(this.#id)
+    window.lustre.server_component.connect()
       .then(() => {
         this.#onConnect();
       });
@@ -888,7 +882,7 @@ var ElectronTransport = class {
       this.#queue.push(data);
       return;
     } else {
-      window.lustre.server_component.send(this.#id, JSON.stringify(data));
+      window.lustre.server_component.send(JSON.stringify(data));
       this.#waitingForResponse = true;
     }
   }

@@ -9,14 +9,26 @@ const __dirname = path.dirname(__filename);
 let sockets = {};
 let windows = {};
 
-ipcMain.handle('lustre:server-component:connect', async (event, id) => {
-  windows[id] = BrowserWindow.fromWebContents(event.sender);
+function makeId() {
+  return btoa(`${performance.now()}${Math.random()}`.replaceAll('.', ''));
+}
+
+ipcMain.handle('lustre:server-component:connect', async (event) => {
+  const id = makeId();
+  const win = BrowserWindow.fromWebContents(event.sender);
+
+  win['lustre'] = { server_component: { socket_id: id }};
+
+  windows[id] = win;
   sockets[id] = GleamCounter.init_counter_socket(id);
 
   return null;
 });
 
-ipcMain.handle('lustre:server-component:send', async (_event, id, msg) => {
+ipcMain.handle('lustre:server-component:send', async (event, msg) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  const id = win.lustre.server_component.socket_id;
+
   GleamCounter.handle_websocket_message(sockets[id], msg);
 
   return null;
