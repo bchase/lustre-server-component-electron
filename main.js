@@ -13,6 +13,11 @@ function makeId() {
   return btoa(`${performance.now()}${Math.random()}`.replaceAll('.', ''));
 }
 
+function getId(event) {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  return win.lustre.server_component.socket_id;
+}
+
 ipcMain.handle('lustre:server-component:connect', async (event) => {
   const id = makeId();
   const win = BrowserWindow.fromWebContents(event.sender);
@@ -26,16 +31,20 @@ ipcMain.handle('lustre:server-component:connect', async (event) => {
 });
 
 ipcMain.handle('lustre:server-component:send', async (event, msg) => {
-  const win = BrowserWindow.fromWebContents(event.sender);
-  const id = win.lustre.server_component.socket_id;
+  const id = getId(event);
 
   GleamCounter.handle_websocket_message(sockets[id], msg);
 
   return null;
 });
 
-ipcMain.handle('lustre:server-component:close', async (_event) => {
-  // TODO clean up `sockets` & `windows`
+ipcMain.handle('lustre:server-component:close', async (event) => {
+  const id = getId(event);
+
+  delete sockets[id];
+  delete windows[id];
+
+  // TODO ?
 
   return null;
 });
