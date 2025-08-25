@@ -818,12 +818,7 @@ var ServerComponent = class extends HTMLElement {
     const options = { onConnect, onMessage, onClose };
     switch (this.#method) {
       case "electron":
-        const connect = window[this.getAttribute('electron-connect')];
-        const listen = window[this.getAttribute('electron-listen')];
-        const send = window[this.getAttribute('electron-send')];
-        const close = window[this.getAttribute('electron-close')];
-        const funcs = { connect, listen, send, close };
-        this.#transport = new ElectronTransport(funcs, options);
+        this.#transport = new ElectronTransport(this, options);
         break;
       case "ws":
         this.#transport = new WebsocketTransport(this.#route, options);
@@ -855,12 +850,12 @@ var ElectronTransport = class {
 
   #funcs = {};
 
-  constructor(funcs, { onConnect, onMessage, onClose }) {
-    this.#funcs = funcs;
-
+  constructor(el, { onConnect, onMessage, onClose }) {
     this.#onConnect = onConnect;
     this.#onMessage = onMessage;
     this.#onClose = onClose;
+
+    this.#funcs = this.#buildFuncs(el);
 
     if ( this.#allFuncsPresent() ) {
       this.#listen();
@@ -891,6 +886,15 @@ var ElectronTransport = class {
   close() {
     this.#funcs.close();
     this.#onClose();
+  }
+
+  #buildFuncs(el) {
+    const connect = window[el.getAttribute('electron-connect')];
+    const listen = window[el.getAttribute('electron-listen')];
+    const send = window[el.getAttribute('electron-send')];
+    const close = window[el.getAttribute('electron-close')];
+
+    return { connect, listen, send, close };
   }
 
   #allFuncsPresent() {
