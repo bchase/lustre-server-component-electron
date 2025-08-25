@@ -818,7 +818,12 @@ var ServerComponent = class extends HTMLElement {
     const options = { onConnect, onMessage, onClose };
     switch (this.#method) {
       case "electron":
-        this.#transport = new ElectronTransport(options);
+        const connect = window[this.getAttribute('electron-connect')];
+        const listen = window[this.getAttribute('electron-listen')];
+        const send = window[this.getAttribute('electron-send')];
+        const close = window[this.getAttribute('electron-close')];
+        const funcs = { connect, listen, send, close };
+        this.#transport = new ElectronTransport(funcs, options);
         break;
       case "ws":
         this.#transport = new WebsocketTransport(this.#route, options);
@@ -848,17 +853,63 @@ var ElectronTransport = class {
   #onMessage;
   #onClose;
 
-  constructor({ onConnect, onMessage, onClose }) {
+  #funcs = {};
+
+  constructor(funcs, { onConnect, onMessage, onClose }) {
+    this.#funcs = funcs;
+
     this.#onConnect = onConnect;
     this.#onMessage = onMessage;
     this.#onClose = onClose;
 
-    window.lustre.server_component.listen((data) => {
+    if ( this.#allFuncsPresent() ) {
+      this.#listen();
+      this.#connect();
+    } else {
+      console.error([
+        "[Lustre Server Component Client Runtime]",
+        "Some functions necessary for Electron transport are missing.",
+        "Please make sure you've specified:",
+        "  electron-connect",
+        "  electron-listen",
+        "  electron-send",
+        "  electron-close",
+      ].join("\n"));
+    }
+  }
+
+  send(data) {
+    if (this.#waitingForResponse) {
+      this.#queue.push(data);
+      return;
+    } else {
+      this.#funcs.send(JSON.stringify(data));
+      this.#waitingForResponse = true;
+    }
+  }
+
+  close() {
+    this.#funcs.close();
+    this.#onClose();
+  }
+
+  #allFuncsPresent() {
+    return [
+      this.#funcs.connect,
+      this.#funcs.send,
+      this.#funcs.listen,
+      this.#funcs.close,
+    ]
+      .every((func) => typeof func === 'function')
+  }
+
+  #listen() {
+    this.#funcs.listen((data) => {
       try {
         this.#onMessage(JSON.parse(data));
       } finally {
         if (this.#queue.length) {
-          window.lustre.server_component.send(
+          this.#funcs.send(
             JSON.stringify({
               kind: batch_kind,
               messages: this.#queue
@@ -870,25 +921,13 @@ var ElectronTransport = class {
         this.#queue = [];
       }
     });
+  }
 
-    window.lustre.server_component.connect()
+  #connect() {
+    this.#funcs.connect()
       .then(() => {
         this.#onConnect();
       });
-  }
-
-  send(data) {
-    if (this.#waitingForResponse) {
-      this.#queue.push(data);
-      return;
-    } else {
-      window.lustre.server_component.send(JSON.stringify(data));
-      this.#waitingForResponse = true;
-    }
-  }
-
-  close() {
-    this.#onClose();
   }
 };
 var WebsocketTransport = class {
