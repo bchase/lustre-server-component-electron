@@ -1,3 +1,4 @@
+import lustre/effect.{type Effect}
 import gleam/int
 import lustre.{type App}
 import lustre/attribute
@@ -6,14 +7,14 @@ import lustre/element/html
 import lustre/event
 
 pub fn component() -> App(_, Model, Msg) {
-  lustre.simple(init, update, view)
+  lustre.component(init, update, view, [])
 }
 
 pub type Model =
   Int
 
-fn init(_) -> Model {
-  0
+fn init(_) -> #(Model, Effect(Msg)) {
+  #(0, effect.none())
 }
 
 pub opaque type Msg {
@@ -21,10 +22,13 @@ pub opaque type Msg {
   Dec
 }
 
-fn update(model: Model, msg: Msg) -> Model {
+fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
-    Inc -> model + 1
-    Dec -> model - 1
+    Inc ->
+      #(model + 1, effect.none())
+
+    Dec ->
+      #(model + 1, effect.none())
   }
 }
 
