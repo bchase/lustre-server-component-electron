@@ -2,12 +2,22 @@ import lustre/effect.{type Effect}
 import gleam/int
 import lustre.{type App}
 import lustre/attribute
+import lustre/component
 import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
 
 pub fn component() -> App(_, Model, Msg) {
-  lustre.component(init, update, view, [])
+  lustre.component(init, update, view, [
+    component.on_attribute_change("app-keydown", fn(str) {
+      case str |> echo {
+        "Escape" -> {
+          Ok(Inc)
+        }
+        _ -> Error(Nil)
+      }
+    })
+  ])
 }
 
 pub type Model =

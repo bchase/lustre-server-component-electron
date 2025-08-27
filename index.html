@@ -17,5 +17,16 @@
       electron-send="lustre_sc_send"
       electron-close="lustre_sc_close"
     ></lustre-server-component>
+
+    <script>
+      (() => {
+        const lsc = document.querySelector('lustre-server-component');
+
+        window.addEventListener('keydown', (evt) => {
+          console.log(evt);
+          lsc.setAttribute("app-keydown", evt.key);
+        })
+      })()
+    </script>
   </body>
 </html>
